@@ -36,3 +36,6 @@ CREATE TABLE IF NOT EXISTS analytics.fact_delay (
     rolling_delay_1h FLOAT,
     rolling_delay_24h FLOAT
 );
+
+ALTER TABLE raw.trips 
+ADD CONSTRAINT unique_trip UNIQUE (trip_id, station_id, planned_time);

@@ -1,0 +1,9 @@
+app
+db
+ingestion
+logs
+ml
+model_registry
+scripts
+tests
+venv

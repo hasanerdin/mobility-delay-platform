@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mobility-delay-platform"
+version = "0.1.0"
+description = "DB Mobility Delay Prediction"
+authors = [
+    { name = "Hasan Erdin" }
+]
+readme = "README.md"
+requires-python = ">=3.10"
+
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "pydantic",
+    "pydantic_settings",
+    "sqlalchemy",
+    "psycopg2-binary",
+    "python-dotenv",
+    "pandas",
+    "scikit-learn",
+    "joblib",
+    "requests"
+]
+
+[tool.setuptools.packages.find]
+where = ["."]

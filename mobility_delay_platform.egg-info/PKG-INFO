@@ -1,0 +1,18 @@
+Metadata-Version: 2.4
+Name: mobility-delay-platform
+Version: 0.1.0
+Summary: DB Mobility Delay Prediction
+Author: Hasan Erdin
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: fastapi
+Requires-Dist: uvicorn
+Requires-Dist: pydantic
+Requires-Dist: pydantic_settings
+Requires-Dist: sqlalchemy
+Requires-Dist: psycopg2-binary
+Requires-Dist: python-dotenv
+Requires-Dist: pandas
+Requires-Dist: scikit-learn
+Requires-Dist: joblib
+Requires-Dist: requests

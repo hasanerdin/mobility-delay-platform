@@ -12,3 +12,6 @@ train:
 
 retrain:
 	docker-compose exec api python ml/retrain.py
+
+ingest:
+	docker-compose exec api python ingestion/run_ingestion.py

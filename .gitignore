@@ -4,3 +4,4 @@ __pycache__/
 *.pkl
 postgres_data/
 logs/*.log
+venv

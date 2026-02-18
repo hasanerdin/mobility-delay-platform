@@ -8,6 +8,10 @@ class Settings(BaseSettings):
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
 
+    DB_CLIENT_ID: str
+    DB_API_KEY: str
+    DB_URL: str
+
     MODEL_VERSION: str = "v1"
     LOG_LEVEL: str = "INFO"
 

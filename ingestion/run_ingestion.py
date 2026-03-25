@@ -1,5 +1,3 @@
-from typing import List, Dict
-
 from ingestion.client import fetch_plans, fetch_changes
 from ingestion.parser import parse_plan, parse_changes
 from ingestion.merger import merge_plan_and_changes

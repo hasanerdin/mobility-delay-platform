@@ -1,0 +1,24 @@
+version: 2
+
+models:
+  - name: fact_delay
+    description: "Aggregated delay metrics by station and hour."
+
+    columns:
+
+      - name: station_id
+        description: "Identifier for the station where the trip started."
+        tests:
+          - not_null
+
+      - name: hour
+        description: "Hour of the day (0-23) when the trip was scheduled to depart."
+
+      - name: total_trips
+        description: "Total number of trips departing from the station during the hour."
+
+      - name: avg_delay
+        description: "Average delay in minutes for trips departing from the station during the hour."
+
+      - name: delayed_trips
+        description: "Number of trips that were delayed (delay_minutes > 0) departing from the station during the hour."

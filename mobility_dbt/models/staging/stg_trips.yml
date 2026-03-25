@@ -1,0 +1,28 @@
+version: 2
+
+models:
+  - name: stg_trips
+    description: "Cleaned trips data from raw layer"
+
+    columns:
+
+      - name: trip_id
+        description: "Unique trip identifier"
+        tests:
+          - not_null
+          - unique
+
+      - name: planned_time
+        description: "Scheduled departure time for the trip."
+        tests:
+          - not_null
+
+      - name: delay_minutes
+        description: "Delay in minutes calculated as the difference between actual and planned time."
+
+      - name: delay_bucket
+        description: "Categorical bucket for delay severity."
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['on_time', 'minor', 'medium', 'major', 'unknown']

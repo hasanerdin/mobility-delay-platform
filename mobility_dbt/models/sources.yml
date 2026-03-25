@@ -1,0 +1,22 @@
+version: 2
+
+sources:
+  - name: raw
+    description: "Raw data sources ingested into the system."
+    database: mobility
+    schema: raw
+    tables:
+      - name: trips
+        description: "Raw trip data ingested from the source system."
+        columns:
+          - name: trip_id
+            description: "Unique identifier for each trip."
+            tests:
+              - not_null
+              - unique
+          - name: station_id
+            description: "Identifier for the station where the trip started."
+          - name: planned_time
+            description: "Scheduled departure time for the trip."
+          - name: actual_time
+            description: "Actual departure time for the trip."

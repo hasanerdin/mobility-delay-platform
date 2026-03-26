@@ -1,6 +1,6 @@
 import requests
 from zoneinfo import ZoneInfo
-from datetime import datetime, timezone
+from datetime import datetime
 
 from app.core.config import get_settings
 

@@ -5,3 +5,4 @@ __pycache__/
 postgres_data/
 logs/*.log
 venv
+dataset

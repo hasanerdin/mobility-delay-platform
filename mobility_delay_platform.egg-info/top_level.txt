@@ -1,8 +1,11 @@
 app
+dags
+dataset
 db
 ingestion
 logs
 ml
+mobility_dbt
 model_registry
 scripts
 tests

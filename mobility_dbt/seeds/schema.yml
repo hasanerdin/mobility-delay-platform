@@ -1,0 +1,6 @@
+seeds:
+  - name: historical_trips
+    config:
+      column_types:
+        id: text
+        train_line_ride_id: text

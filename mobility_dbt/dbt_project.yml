@@ -22,6 +22,15 @@ clean-targets:         # directories to be removed by `dbt clean`
   - "target"
   - "dbt_packages"
 
+seeds:
+  # Configuring seeds
+  # Full documentation: https://docs.getdbt.com/docs/configuring-seeds
+
+  # In this example config, we tell dbt to load all CSV files in the seeds/
+  # directory as tables. These settings can be overridden in the individual seed
+  # files using the `{{ config(...) }}` macro.
+  mobility_dbt:
+    +schema: raw
 
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models

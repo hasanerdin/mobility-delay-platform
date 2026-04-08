@@ -7,6 +7,8 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_db
 from app.repositories import delays as delay_repo
 from app.schemas.delays import DelayByHour, DelaySummaryRow, StationDelayStats
+from app.schemas.prediction import PredictionRequest, PredictionResponse
+from app.services import prediction as prediction_service
 
 router = APIRouter(tags=["delays"])
 
@@ -68,3 +70,30 @@ def top_delayed_stations(
     Example: GET /delays/top-delayed?limit=5
     """
     return delay_repo.get_top_delayed_stations(db, limit)
+
+
+@router.post("/predict", response_model=PredictionResponse, tags=["ml"])
+def predict_delay(body: PredictionRequest):
+    """
+    Predict the delay bucket for a trip given station, hour, and day.
+
+    Returns the predicted class (on_time / minor / medium / major)
+    and the probability for each class.
+
+    Example:
+        POST /predict
+        {"station_id": "8000261", "hour": 8, "day_of_week": 1, "is_weekend": false}
+    """
+    try:
+        result = prediction_service.predict(
+            station_id=body.station_id,
+            hour=body.hour,
+            day_of_week=body.day_of_week,
+            is_weekend=body.is_weekend,
+        )
+        return result
+    except FileNotFoundError as e:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=str(e),
+        )

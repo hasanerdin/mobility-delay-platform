@@ -1,0 +1,101 @@
+name: CI
+
+# Trigger on every push and on pull requests targeting main
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # -------------------------------------------------------------------------
+  # Job 1: run pytest (unit + integration tests)
+  # No database needed — the DB dependency is mocked in conftest.py
+  # -------------------------------------------------------------------------
+  test:
+    name: pytest
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"          # cache pip packages between runs for speed
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run tests
+        env:
+          # Pydantic Settings reads these from environment at import time.
+          # They don't need to be real values for unit/integration tests
+          # because the DB dependency is mocked — but the Settings class
+          # still validates that they exist.
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          POSTGRES_DB: mobility
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+          DB_CLIENT_ID: test
+          DB_API_KEY: test
+          DB_URL: http://test
+        run: pytest tests/ -v --tb=short
+
+  # -------------------------------------------------------------------------
+  # Job 2: dbt test (runs in parallel with the test job)
+  # Spins up a real PostgreSQL container, seeds data, runs dbt models + tests
+  # -------------------------------------------------------------------------
+  dbt:
+    name: dbt test
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: mobility
+        ports:
+          - 5432:5432
+        # Wait until postgres is ready before running steps
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Initialise database schema
+        env:
+          PGPASSWORD: password
+        run: psql -h localhost -U user -d mobility -f db/init.sql
+
+      - name: Run dbt seed + run + test
+        working-directory: mobility_dbt
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          POSTGRES_DB: mobility
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+        run: |
+          dbt seed --profiles-dir .
+          dbt run --profiles-dir .
+          dbt test --profiles-dir .

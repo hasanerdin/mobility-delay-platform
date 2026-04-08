@@ -10,3 +10,5 @@ scikit-learn
 joblib
 requests
 dbt-postgres
+pytest
+httpx

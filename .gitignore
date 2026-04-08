@@ -5,4 +5,7 @@ __pycache__/
 postgres_data/
 logs/*.log
 venv
+.venv
 dataset
+mobility_dbt/target/
+mobility_dbt/dbt_packages/

@@ -7,7 +7,7 @@ from app.schemas.health import HealthResponse
 
 router = APIRouter(prefix="/health", tags=["health"])
 
-@router.get("", response_class=HealthResponse)
+@router.get("", response_model=HealthResponse)
 def health_check() -> HealthResponse:
     try:
         with engine.connect() as connection:

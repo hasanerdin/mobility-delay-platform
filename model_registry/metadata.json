@@ -1,0 +1,19 @@
+{
+  "trained_at": "2026-04-08T15:50:55.763537+00:00",
+  "training_rows": 1600,
+  "test_accuracy": 0.3325,
+  "features": [
+    "hour",
+    "day_of_week",
+    "is_weekend",
+    "station_id"
+  ],
+  "target": "delay_bucket",
+  "classes": [
+    "major",
+    "medium",
+    "minor",
+    "on_time"
+  ],
+  "model_type": "RandomForestClassifier"
+}

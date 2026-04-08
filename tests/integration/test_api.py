@@ -11,14 +11,18 @@ from unittest.mock import patch
 # ---------------------------------------------------------------------------
 # /health
 # ---------------------------------------------------------------------------
+# health.py uses engine.connect() directly (not the get_db dependency),
+# so we patch it here to avoid needing a real database in CI.
 
 def test_health_returns_200(client):
-    response = client.get("/health")
+    with patch("app.api.health.engine.connect"):
+        response = client.get("/health")
     assert response.status_code == 200
 
 
 def test_health_response_shape(client):
-    response = client.get("/health")
+    with patch("app.api.health.engine.connect"):
+        response = client.get("/health")
     body = response.json()
     assert "status" in body
     assert "timestamp" in body

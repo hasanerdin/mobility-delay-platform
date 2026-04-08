@@ -1,35 +1,33 @@
 version: 2
 
 models:
-  - name: stg_realtime_trips
+  - name: stg_historical_trips
     description: >
-      Cleaned and enriched real-time trips from raw.trips.
-      Adds feature columns (hour, day_of_week, is_weekend, is_delayed, delay_bucket)
-      used by both the analytics layer and the ML model.
-      Negative delays are clamped to 0 (GREATEST(delay_minutes, 0)).
+      Cleaned and enriched historical trips from raw.historical_trips (dbt seed).
+      Filtered to München Hbf only. Same feature columns as stg_realtime_trips
+      so both can be combined in stg_trips via UNION ALL.
 
     columns:
       - name: trip_id
-        description: "Unique trip identifier from the Deutsche Bahn plan feed."
+        description: "Original row ID from the historical dataset, cast to text."
         tests:
           - not_null
-          - unique
 
       - name: station_id
-        description: "EVA number of the station."
+        description: "EVA station number cast to text."
         tests:
           - not_null
 
       - name: planned_time
-        description: "Scheduled arrival/departure time."
+        description: "Scheduled departure or arrival time (departure preferred, fallback to arrival)."
         tests:
           - not_null
 
       - name: actual_time
-        description: "Actual arrival/departure time. NULL if no change was reported."
+        description: "Actual departure or arrival time. NULL if not recorded."
 
       - name: delay_minutes
-        description: "Delay in minutes. NULL if actual_time is unknown. Negative values clamped to 0."
+        description: "Delay in minutes as recorded in the historical dataset."
 
       - name: hour
         description: "Hour of day extracted from planned_time (0-23)."
@@ -56,7 +54,7 @@ models:
         description: "True if delay_minutes > 0."
 
       - name: delay_bucket
-        description: "Categorical delay severity: on_time=0, minor=1-5, medium=6-15, major=>15, unknown=NULL."
+        description: "Categorical delay severity: on_time, minor, medium, major, unknown."
         tests:
           - accepted_values:
               arguments:

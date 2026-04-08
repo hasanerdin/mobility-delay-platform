@@ -2,12 +2,58 @@ version: 2
 
 sources:
   - name: raw
-    description: "Raw data sources ingested into the system."
+    description: "Raw data ingested into the platform before any transformation."
     database: mobility
     schema: raw
+
     tables:
       - name: trips
-        description: "Raw trip data ingested from the source system."
+        description: >
+          Real-time trip data ingested hourly from the Deutsche Bahn API.
+          Each row represents one train arrival at a station for a given planned time.
+          Delay is computed as actual_time - planned_time at ingestion time.
+          Late-arriving changes are not backfilled (known limitation).
+        loaded_at_field: ingestion_timestamp
+        freshness:
+          warn_after: {count: 2, period: hour}
+          error_after: {count: 6, period: hour}
+        columns:
+          - name: id
+            description: "Auto-incremented primary key."
+          - name: trip_id
+            description: "Unique identifier for the trip, sourced from the Deutsche Bahn plan feed."
+            tests:
+              - not_null
+          - name: station_id
+            description: "EVA number of the station (e.g. 8000261 = München Hbf)."
+            tests:
+              - not_null
+          - name: planned_time
+            description: "Scheduled arrival time as provided by the DB plan feed."
+            tests:
+              - not_null
+          - name: actual_time
+            description: "Actual arrival time from the DB changes feed. NULL if no change was reported."
+          - name: delay_minutes
+            description: "Delay in minutes (actual_time - planned_time). NULL if actual_time is unknown."
+          - name: raw_payload
+            description: "Full trip dict serialized as JSONB for auditability and reprocessing."
+          - name: ingestion_timestamp
+            description: "Timestamp when this row was written to the database."
+            tests:
+              - not_null
 
       - name: historical_trips
-        description: "Historical trip data used for training and analysis."
+        description: >
+          Historical Deutsche Bahn trip data loaded via dbt seed.
+          Generated from monthly Parquet files (22 months), filtered to München Hbf,
+          sampled at 100 rows per month. Used for ML training and historical analysis.
+        columns:
+          - name: id
+            description: "Original row identifier from the historical dataset."
+          - name: eva
+            description: "EVA station number."
+            tests:
+              - not_null
+          - name: delay_in_min
+            description: "Delay in minutes as recorded in the historical dataset."

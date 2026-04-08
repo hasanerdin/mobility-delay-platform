@@ -21,8 +21,8 @@ SELECT
         arrival_change_time
     )::timestamp AS actual_time,
 
-    -- delay
-    delay_in_min::int AS delay_minutes,
+    -- delay (clamp negatives to 0 — early arrivals treated as on-time, consistent with stg_realtime_trips)
+    GREATEST(delay_in_min::int, 0) AS delay_minutes,
 
     time::timestamp AS ingestion_time,
 

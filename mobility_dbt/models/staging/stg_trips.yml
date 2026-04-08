@@ -1,0 +1,51 @@
+version: 2
+
+models:
+  - name: stg_trips
+    description: >
+      Unified staging view combining real-time and historical trips via UNION ALL.
+      This is the single source of truth for the analytics and ML layers.
+      Real-time trips come from raw.trips (Deutsche Bahn API).
+      Historical trips come from raw.historical_trips (dbt seed, 22-month dataset).
+
+    columns:
+      - name: trip_id
+        description: "Trip identifier. Unique within each source but not across sources."
+        tests:
+          - not_null
+
+      - name: station_id
+        description: "EVA station number."
+        tests:
+          - not_null
+
+      - name: planned_time
+        description: "Scheduled arrival/departure time."
+        tests:
+          - not_null
+
+      - name: delay_minutes
+        description: "Delay in minutes. NULL means actual time was not recorded."
+
+      - name: delay_bucket
+        description: "Categorical delay severity used as ML target and for analytics grouping."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['on_time', 'minor', 'medium', 'major', 'unknown']
+
+      - name: hour
+        description: "Hour of day (0-23)."
+        tests:
+          - not_null
+
+      - name: day_of_week
+        description: "Day of week (0=Sunday, 6=Saturday)."
+        tests:
+          - not_null
+
+      - name: is_weekend
+        description: "True if Saturday or Sunday."
+        tests:
+          - not_null

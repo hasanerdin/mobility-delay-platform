@@ -2,23 +2,88 @@ version: 2
 
 models:
   - name: fact_delay
-    description: "Aggregated delay metrics by station and hour."
+    description: >
+      Aggregated delay metrics per station per hour of day.
+      Pre-computed from stg_trips for fast API queries.
+      Full-refresh on every dbt run.
 
     columns:
-
       - name: station_id
-        description: "Identifier for the station where the trip started."
+        description: "EVA station number."
         tests:
           - not_null
 
       - name: hour
-        description: "Hour of the day (0-23) when the trip was scheduled to depart."
+        description: "Hour of day (0-23)."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]
 
       - name: total_trips
-        description: "Total number of trips departing from the station during the hour."
+        description: "Total number of trips aggregated for this station and hour."
+        tests:
+          - not_null
 
       - name: avg_delay
-        description: "Average delay in minutes for trips departing from the station during the hour."
+        description: "Average delay in minutes across all trips for this station and hour."
 
       - name: delayed_trips
-        description: "Number of trips that were delayed (delay_minutes > 0) departing from the station during the hour."
+        description: "Number of trips with delay_minutes > 0 for this station and hour."
+        tests:
+          - not_null
+
+  - name: fact_delay_summary
+    description: >
+      Daily delay summary per station per hour.
+      More granular than fact_delay — includes date, day_of_week, is_weekend, and delay_rate.
+      Used by the API summary endpoint and Streamlit dashboard.
+
+    columns:
+      - name: date
+        description: "Calendar date of the trips."
+        tests:
+          - not_null
+
+      - name: station_id
+        description: "EVA station number."
+        tests:
+          - not_null
+
+      - name: hour
+        description: "Hour of day (0-23)."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]
+
+      - name: day_of_week
+        description: "Day of week (0=Sunday, 6=Saturday)."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0,1,2,3,4,5,6]
+
+      - name: is_weekend
+        description: "True if Saturday or Sunday."
+        tests:
+          - not_null
+
+      - name: total_trips
+        description: "Total trips for this date, station, and hour."
+        tests:
+          - not_null
+
+      - name: avg_delay
+        description: "Average delay in minutes."
+
+      - name: delayed_trips
+        description: "Number of delayed trips."
+        tests:
+          - not_null
+
+      - name: delay_rate
+        description: "Ratio of delayed trips to total trips (0.0-1.0)."

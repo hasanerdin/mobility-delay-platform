@@ -16,7 +16,7 @@ def health_check() -> HealthResponse:
                               timestamp=datetime.now(timezone.utc),
                               database="connected")
     except Exception as e:
-        return HTTPException(
+        raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=f"Database connection failed: {str(e)}"
         )
